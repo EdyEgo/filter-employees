@@ -6,15 +6,16 @@ import Slider from '@mui/material/Slider';
 import PopoverMenu from './PopoverMenu';
 import ProTip from './ProTip';
 
+
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
+      {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
         Your Website
-      </Link>{' '}
+      </Link>{" "}
       {new Date().getFullYear()}
-      {'.'}
+      {"."}
     </Typography>
   );
 }
@@ -24,13 +25,13 @@ export default function App() {
     <Container maxWidth="sm">
       <div className="my-4">
         <Typography variant="h4" component="h1" gutterBottom>
-          Create React App + Tailwind CSS example
+          Bruh
         </Typography>
         <Slider
           className="my-4"
           defaultValue={30}
-          classes={{ active: 'shadow-none' }}
-          componentsProps={{ thumb: { className: 'hover:shadow-none' } }}
+          classes={{ active: "shadow-none" }}
+          componentsProps={{ thumb: { className: "hover:shadow-none" } }}
         />
         <PopoverMenu />
         <ProTip />
