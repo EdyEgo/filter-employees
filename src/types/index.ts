@@ -5,7 +5,7 @@ export interface simpleEmployeesTableList {
     | "cnp"
     | "role"
     | "salary"
-    | "offdays"
+    | "offDays"
     | "departamentDescription";
 
   label: string;

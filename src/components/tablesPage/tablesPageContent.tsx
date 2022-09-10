@@ -56,7 +56,7 @@ const TablesPageContentContainer: React.FC<
         id,
         idDepartment,
         lastName,
-        offdays,
+        offDays,
         role,
         salary,
       }: {
@@ -65,7 +65,7 @@ const TablesPageContentContainer: React.FC<
         cnp: number;
         role: string;
         salary: number;
-        offdays: number;
+        offDays: number;
         departamentDescription: string;
         id: number;
         idDepartment: number;
@@ -75,7 +75,7 @@ const TablesPageContentContainer: React.FC<
           lastName,
           cnp,
           role,
-          offdays,
+          offDays,
           departamentDescription,
           salary: `${salary} ${DEFAULT_CURRENCY}`,
           id,
@@ -89,7 +89,7 @@ const TablesPageContentContainer: React.FC<
         { id: "cnp", label: "CNP", minWidth: 120 },
         { id: "role", label: "Functie", minWidth: 120 },
         { id: "salary", label: "Salariu", minWidth: 120 },
-        { id: "offdays", label: "Zile de concediu", minWidth: 120 },
+        { id: "offDays", label: "Zile de concediu", minWidth: 120 },
         {
           id: "departamentDescription",
           label: "Descriere departament",
