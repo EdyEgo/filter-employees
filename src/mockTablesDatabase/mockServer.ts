@@ -1,5 +1,5 @@
-import departments from "./departamentsTable.json" assert { type: "json" };
-import employees from "./employeesTable.json" assert { type: "json" };
+import departments from "./departamentsTable.json";
+import employees from "./employeesTable.json";
 import RandomNumber from "../generalHelperFunctions/returnRandomNumberInSelectedRange";
 
 function resolveRequestAfterRandomTime(requestData: any) {

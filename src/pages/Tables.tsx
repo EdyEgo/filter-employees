@@ -1,10 +1,12 @@
+import HeaderTable from "../components/tablesPage/TablesPageHeader";
+import ContentTable from "../components/tablesPage/tablesPageContent";
 interface TablesPageProps {}
 
 const TablesPage: React.FC<TablesPageProps> = () => {
   return (
     <div className="tables-page-container">
-      <div className="filter-by-header-container"></div>
-      <div className="content-table-result-list-container"></div>
+      <HeaderTable />
+      <ContentTable />
     </div>
   );
 };

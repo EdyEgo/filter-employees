@@ -1,12 +1,18 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { createTheme, StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import {
+  createTheme,
+  StyledEngineProvider,
+  ThemeProvider,
+} from "@mui/material/styles";
+import { CssBaseline } from "@mui/material";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import { store } from "./store/store"; // i should just name this index
+import { Provider } from "react-redux"; // i prefer redux instead of the react reducer(overkill)
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 const root = createRoot(rootElement!);
 
 // All `Portal`-related components need to have the the main app wrapper element as a container
@@ -31,10 +37,12 @@ root.render(
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </ThemeProvider>
     </StyledEngineProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
