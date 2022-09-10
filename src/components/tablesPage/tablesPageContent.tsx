@@ -18,7 +18,7 @@ interface TablesPageContentContainerProps {}
 const TablesPageContentContainer: React.FC<
   TablesPageContentContainerProps
 > = () => {
-  // salary is just a number we don t know from the datase if it is in euro or in other currency 
+  // salary is just a number we don t know from the datase if it is in euro or in other currency
 
   const DEFAULT_CURRENCY = "lei";
   const dispatch = useDispatch();
@@ -26,33 +26,28 @@ const TablesPageContentContainer: React.FC<
     (state: any) => state.tableData.employeeTableList
   );
 
+  const deparmentsList = useSelector(
+    (state: any) => state.tableData.deparmentsTableList
+  );
+
+  const filterTableDataBy = useSelector(
+    (state: any) => state.tablesFilters.filterTableDataBy
+  );
+
   const [displayErrorMessage, setDisplayErrorMessage] = useState<null | string>(
     null
   );
+  const [tableInfo, setTableInfo] = useState<null | {
+    columnConfiguration: any;
+    rowsData: any;
+  }>(null);
 
-  async function handleStoreEmployeesList() {
-    const { error, data } = await getAllEmployeesApi();
-
-    if (error) {
-      setDisplayErrorMessage("Could not get the employees list");
-
-      setTimeout(() => {
-        setDisplayErrorMessage(null);
-      }, 2000);
-      return;
-    }
-    // add list to localStorage
-
-    dispatch(addEmployeeTableList(data));
-  }
-
-  useEffect(() => {
-    if (employeesList.length <= 0) {
-      handleStoreEmployeesList();
-    }
-  }, []);
-
-  const tableCases = {
+  const tableCases: {
+    [typeTable: string]: (tableList: any) => {
+      columnConfiguration: any;
+      rowsData: any;
+    };
+  } = {
     simpleEmployeesTableList(list: any) {
       function createData({
         cnp,
@@ -107,13 +102,52 @@ const TablesPageContentContainer: React.FC<
 
       return { columnConfiguration, rowsData };
     },
-    averageEmployeesDepartmentSalary() {},
+    averageEmployeesDepartmentSalary() {
+      return { columnConfiguration: null, rowsData: null };
+    },
   };
 
-  console.log("my employee list ", employeesList);
+  async function handleStoreEmployeesList() {
+    const { error, data } = await getAllEmployeesApi();
+
+    if (error) {
+      setDisplayErrorMessage("Could not get the employees list");
+
+      setTimeout(() => {
+        setDisplayErrorMessage(null);
+      }, 2000);
+      return;
+    }
+    // add list to localStorage
+    const list: any = data;
+
+    setTableInfo(tableCases[filterTableDataBy](list));
+    dispatch(addEmployeeTableList(data));
+  }
+
+  const tableInfos = tableCases[filterTableDataBy](employeesList);
+
+  useEffect(() => {
+    if (employeesList.length <= 0) {
+      handleStoreEmployeesList();
+    }
+  }, []);
+
+  console.log("my employee list ", employeesList, tableInfo);
   return (
     <div className="table-list-content-container">
-      <TableList />
+      {/* {tableInfo != null && (
+        <TableList
+          columns={tableInfo.columnConfiguration}
+          rows={tableInfo.rowsData}
+        />
+      )} */}
+      {tableInfos != null && (
+        <TableList
+          columns={tableInfos.columnConfiguration}
+          rows={tableInfos.rowsData}
+        />
+      )}
     </div>
   );
 };
