@@ -24,6 +24,7 @@ const TablesPageContentContainer: React.FC<
 
   const DEFAULT_CURRENCY = "lei";
   const dispatch = useDispatch();
+
   const employeesList = useSelector(
     (state: any) => state.tableData.employeeTableList
   );
@@ -235,7 +236,6 @@ const TablesPageContentContainer: React.FC<
       return;
     }
     // add list to localStorage
-    const list: any = data;
 
     dispatch(addEmployeeTableList(data));
 
@@ -258,12 +258,11 @@ const TablesPageContentContainer: React.FC<
 
   return (
     <div className="table-list-content-container">
-      {/* {tableInfo != null && (
-        <TableList
-          columns={tableInfo.columnConfiguration}
-          rows={tableInfo.rowsData}
-        />
-      )} */}
+      {loadingData && (
+        <div className="loading-tables font-extrabold text-center mt-10">
+          Loading tables...
+        </div>
+      )}
       {displayErrorMessage != null && (
         <div className="p-5 font-bold table-error-message-container">
           {displayErrorMessage}
