@@ -5,10 +5,12 @@ export default function BasicButtons({
   newState,
   buttonState,
   buttonName,
+
   buttoncontainerClassStyles,
 }: {
   buttoncontainerClassStyles?: string;
   buttonName: string;
+
   buttonState: boolean;
   newState: string | boolean;
   setNewButtonState: (newState: boolean | string) => void;
@@ -19,6 +21,10 @@ export default function BasicButtons({
         buttoncontainerClassStyles != null ? buttoncontainerClassStyles : ""
       }`}
       onClick={() => {
+        if (buttonState) {
+          // if the button state is active when is pressed  then don t change the state
+          return;
+        }
         setNewButtonState(newState);
       }}
     >

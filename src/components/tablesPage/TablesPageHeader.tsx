@@ -19,8 +19,6 @@ const TablesPageHeader: React.FC<TablesPageHeaderProps> = () => {
     dispatch(changeFilterByType({ filterTableBy }));
   }
 
-  // if Average Employees Salary Per Department is selected make it true
-
   const newStateToSelect =
     filterTableDataBy === "averageEmployeesDepartmentSalary"
       ? "simpleEmployeesTableList"
