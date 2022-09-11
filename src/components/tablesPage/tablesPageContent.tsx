@@ -1,4 +1,6 @@
 import TableList from "../ui/tableList";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect, useState } from "react";
 import type {
   averageEmployeesDepartmentSalary,
@@ -34,13 +36,20 @@ const TablesPageContentContainer: React.FC<
     (state: any) => state.tablesFilters.filterTableDataBy
   );
 
+  const [loadingData, setLoadingData] = useState(false);
+
   const [displayErrorMessage, setDisplayErrorMessage] = useState<null | string>(
     null
   );
-  const [tableInfo, setTableInfo] = useState<null | {
-    columnConfiguration: any;
-    rowsData: any;
-  }>(null);
+
+  const [
+    simpleEmployeesTableColumnsAndRows,
+    setSimpleEmployeesTableColumnsAndRows,
+  ] = useState<any>(null);
+  const [
+    averageEmployeesDepartmentSalaryColumnsAndRows,
+    setAverageEmployeesDepartmentSalaryColumnsAndRows,
+  ] = useState<any>(null);
 
   const tableCases: {
     [typeTable: string]: (tableList: any) => {
@@ -49,9 +58,12 @@ const TablesPageContentContainer: React.FC<
     };
   } = {
     simpleEmployeesTableList(list: any) {
+      if (simpleEmployeesTableColumnsAndRows !== null) {
+        return simpleEmployeesTableColumnsAndRows;
+      }
       function createData({
         cnp,
-        departamentDescription,
+
         firstName,
         id,
         idDepartment,
@@ -70,13 +82,15 @@ const TablesPageContentContainer: React.FC<
         id: number;
         idDepartment: number;
       }) {
+        const depatmentDespcriptionById = deparmentsList[idDepartment];
+
         return {
           firstName,
           lastName,
           cnp,
           role,
           offDays,
-          departamentDescription,
+          departamentDescription: `${depatmentDespcriptionById.nume}: ${depatmentDespcriptionById.descriere}`,
           salary: `${salary} ${DEFAULT_CURRENCY}`,
           id,
           idDepartment,
@@ -100,18 +114,120 @@ const TablesPageContentContainer: React.FC<
 
       const rowsData = list.map((item: any) => createData(item));
 
+      setSimpleEmployeesTableColumnsAndRows({ columnConfiguration, rowsData });
       return { columnConfiguration, rowsData };
     },
     averageEmployeesDepartmentSalary() {
-      return { columnConfiguration: null, rowsData: null };
+      function createData({
+        id,
+        descriere,
+        nume,
+        averageSalaries,
+      }: {
+        id: number;
+        descriere: string;
+        nume: string;
+        averageSalaries: number;
+      }) {
+        return {
+          id,
+          departamentDescription: descriere,
+          departmentName: nume,
+          averageEmployeeSalary: averageSalaries,
+        };
+      }
+
+      const columnConfiguration: averageEmployeesDepartmentSalary[] = [
+        {
+          id: "departmentName",
+          label: "Nume departament",
+          minWidth: 120,
+          align: "right",
+        },
+        {
+          id: "departamentDescription",
+          label: "Descriere departament",
+          minWidth: 140,
+          align: "right",
+        },
+        {
+          id: "averageEmployeeSalary",
+          label: "Media Salariilor pe departament",
+          minWidth: 120,
+          align: "right",
+        },
+      ];
+
+      function calculateAverageSalaryPerDepartment() {
+        const salarysDepartmentsList: {
+          [key: string]: { salariesList: number[]; averageSalaries: number };
+        } = {};
+        // deparmentsList
+
+        // loop through the employees list and add for each index of a department and array with salarys
+
+        if (averageEmployeesDepartmentSalaryColumnsAndRows !== null) {
+          return averageEmployeesDepartmentSalaryColumnsAndRows;
+        }
+        employeesList.forEach(
+          ({
+            idDepartment,
+            salary,
+          }: {
+            idDepartment: number;
+            salary: number;
+          }) => {
+            if (typeof salarysDepartmentsList[idDepartment] === "object") {
+              salarysDepartmentsList[idDepartment].salariesList.push(salary);
+              return;
+            }
+
+            salarysDepartmentsList[idDepartment] = {
+              salariesList: [],
+              averageSalaries: 0,
+            };
+            salarysDepartmentsList[idDepartment].salariesList.push(salary);
+          }
+        );
+
+        // loop through the salarysDepartmentsList object and calculate the average salary
+
+        Object.entries(salarysDepartmentsList).forEach(
+          ([idDeparment, departmentObject]) => {
+            const averageSalary =
+              departmentObject.salariesList.reduce((a, b) => a + b, 0) /
+              departmentObject.salariesList.length;
+
+            salarysDepartmentsList[idDeparment].averageSalaries =
+              Math.round(averageSalary);
+            salarysDepartmentsList[idDeparment] = {
+              ...salarysDepartmentsList[idDeparment],
+              ...deparmentsList[idDeparment],
+            };
+          }
+        );
+        setAverageEmployeesDepartmentSalaryColumnsAndRows(
+          salarysDepartmentsList
+        );
+        return salarysDepartmentsList;
+      }
+
+      const averageSalaryList = calculateAverageSalaryPerDepartment();
+      const rows = Object.entries(averageSalaryList).map(
+        ([itemId, itemObject]: any) => createData(itemObject)
+      );
+
+      return { columnConfiguration, rowsData: rows };
     },
   };
 
   async function handleStoreEmployeesList() {
     const { error, data } = await getAllEmployeesApi();
+    const { error: departmentsError, data: deparmentsData } =
+      await getAllDepartments();
 
-    if (error) {
-      setDisplayErrorMessage("Could not get the employees list");
+    if (error || departmentsError) {
+      setDisplayErrorMessage("Could not get the data list from database");
 
       setTimeout(() => {
         setDisplayErrorMessage(null);
@@ -121,19 +237,25 @@ const TablesPageContentContainer: React.FC<
     // add list to localStorage
     const list: any = data;
 
-    setTableInfo(tableCases[filterTableDataBy](list));
     dispatch(addEmployeeTableList(data));
+
+    dispatch(addDepartmentsTableList(deparmentsData));
   }
 
-  const tableInfos = tableCases[filterTableDataBy](employeesList);
+  const tableInfos =
+    employeesList.length > 0 && deparmentsList.length > 0
+      ? tableCases[filterTableDataBy](employeesList)
+      : null;
 
   useEffect(() => {
     if (employeesList.length <= 0) {
-      handleStoreEmployeesList();
+      setLoadingData(true);
+      handleStoreEmployeesList().then(() => {
+        setLoadingData(false);
+      });
     }
   }, []);
 
-  console.log("my employee list ", employeesList, tableInfo);
   return (
     <div className="table-list-content-container">
       {/* {tableInfo != null && (
@@ -142,12 +264,24 @@ const TablesPageContentContainer: React.FC<
           rows={tableInfo.rowsData}
         />
       )} */}
+      {displayErrorMessage != null && (
+        <div className="p-5 font-bold table-error-message-container">
+          {displayErrorMessage}
+        </div>
+      )}
       {tableInfos != null && (
         <TableList
           columns={tableInfos.columnConfiguration}
           rows={tableInfos.rowsData}
         />
       )}
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loadingData}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   );
 };

@@ -2,6 +2,8 @@ const fs = require("fs");
 // import { faker } from "@faker-js/faker";
 const { faker } = require("@faker-js/faker");
 
+//   "@faker-js/faker": "^7.5.0",
+
 let dummyDataToWrite = "";
 
 function getRandomArbitrary(min, max) {
@@ -18,7 +20,7 @@ function createDummyDepartamente() {
     //   createdObject[i] = {id:i,idDepartament:getRandomArbitrary(0,9), name:fullName[0],prenume:fullName[1],cnp:245120124214124, description: "bruh" };
     createdObject.push({
       id: i,
-      id_departament: getRandomArbitrary(0, 9),
+      idDepartment: getRandomArbitrary(0, 9),
       firstName: fullName[0],
       lastName: fullName[1],
       cnp: faker.address.buildingNumber(),
@@ -31,9 +33,9 @@ function createDummyDepartamente() {
   dummyDataToWrite = JSON.stringify(createdObject);
 }
 
-createDummyDepartamente()
+createDummyDepartamente();
 
-fs.writeFileSync('employeesTable.json', dummyDataToWrite);
+fs.writeFileSync("employeesTable.json", dummyDataToWrite);
 
 let departamentsDataToWrite = [
   {
